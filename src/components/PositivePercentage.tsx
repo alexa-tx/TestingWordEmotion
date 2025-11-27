@@ -11,70 +11,63 @@ export default function NeonRingProgress() {
     return () => clearInterval(interval);
   }, []);
 
-  const radius = 70;
+  const radius = 55;
   const stroke = 10;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (progress / 100) * circumference;
 
+  const getColor = () => {
+    if (progress < 40) return "#e74c3c";
+    if (progress < 70) return "#f1c40f";
+    return "#27ae60";
+  };
+
   return (
-    <div className="flex items-center justify-center w-full h-full p-10">
-      
-      {/* 🌫️ Glassmorphism Container */}
-      <motion.div
+    <div className="w-full h-full p-4 flex items-center justify-center">
+      <div
         className="
-          relative p-10 rounded-3xl 
-          backdrop-blur-xl bg-white/10 
-          shadow-[0_0_25px_rgba(255,255,255,0.15)] 
-          border border-white/20
+          w-full h-full
+          flex flex-col items-center justify-center
+          rounded-2xl p-4
+          bg-[var(--card)]
+          border border-[var(--border)]
+          shadow-[0_0_15px_var(--primary)/10]
         "
-        animate={{
-          boxShadow: [
-            "0 0 25px rgba(255,255,255,0.1)",
-            "0 0 35px rgba(255,255,255,0.15)",
-            "0 0 25px rgba(255,255,255,0.1)"
-          ]
-        }}
-        transition={{ duration: 3, repeat: Infinity }}
       >
-
-        {/* Искусственный блеск стекла сверху */}
-        <div className="absolute top-0 left-0 w-full h-full rounded-3xl overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10 blur-xl" />
-        </div>
-
         <div className="relative flex items-center justify-center">
-          
-          {/* Неоновое кольцо вокруг */}
+
+          {/* Внешнее кольцо */}
           <motion.div
-            className="absolute w-[180px] h-[180px] rounded-full"
+            className="absolute w-[150px] h-[150px] rounded-full"
             animate={{
               boxShadow: [
-                "0 0 15px var(--primary)",
-                "0 0 25px var(--primary)",
-                "0 0 15px var(--primary)"
+                "0 0 8px var(--primary)",
+                "0 0 14px var(--primary)",
+                "0 0 8px var(--primary)"
               ]
             }}
             transition={{ duration: 2, repeat: Infinity }}
-            style={{ border: "4px solid var(--primary)" }}
+            style={{ border: "3px solid var(--primary)" }}
           />
 
-          {/* Circular Progress */}
-          <svg width="200" height="200" className="rotate-[-90deg]">
-
+          {/* Прогресс-рисунок */}
+          <svg width="160" height="160" className="rotate-[-90deg]">
+            {/* Фоновая линия */}
             <circle
-              cx="100"
-              cy="100"
+              cx="80"
+              cy="80"
               r={radius}
-              stroke="transparent"
+              stroke="var(--border)"
               strokeWidth={stroke}
               fill="none"
             />
 
+            {/* Прогресс */}
             <circle
-              cx="100"
-              cy="100"
+              cx="80"
+              cy="80"
               r={radius}
-              stroke="var(--primary)"
+              stroke={getColor()}
               strokeWidth={stroke}
               fill="none"
               strokeDasharray={circumference}
@@ -84,14 +77,17 @@ export default function NeonRingProgress() {
             />
           </svg>
 
-          {/* Text */}
+          {/* Значение */}
           <div className="absolute text-center">
-            <p className="text-white text-3xl font-bold drop-shadow-lg">
-              {progress}%
-            </p>
+            <p className="text-[var(--text)] text-2xl font-bold">{progress}%</p>
           </div>
         </div>
-      </motion.div>
+
+        {/* Подпись под прогрессом */}
+        <p className="mt-4 text-sm text-[var(--text)]/70 font-medium">
+          Текущий прогресс анализа
+        </p>
+      </div>
     </div>
   );
 }

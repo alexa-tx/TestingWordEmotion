@@ -23,6 +23,14 @@ export default function Home() {
     { date: "2025-11-24", score: 75 },
   ];
 
+  const feedbackData = [
+  { id: 1, user: "Иван", comment: "Отличный анализ!", date: "2025-11-20" },
+  { id: 2, user: "Мария", comment: "Очень удобно.", date: "2025-11-21" },
+  { id: 3, user: "Алексей", comment: "Понравилось!", date: "2025-11-22" },
+  { id: 4, user: "Ольга", comment: "Супер!", date: "2025-11-23" },
+  { id: 5, user: "Никита", comment: "Буду пользоваться.", date: "2025-11-24" },
+];
+
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--text)]">
       {/* Hero Section */}
@@ -52,27 +60,47 @@ export default function Home() {
 
       <ResultCard/>
 
-      {/* Satisfaction / Slider */}
-      <section className="mt-12 px-6 lg:px-16">
-        <SatisfactionLine satisfaction={satisfaction} />
-      </section>
+{/* Dashboard Overview (2×2 Grid) */}
+<section className="mt-16 px-6 lg:px-16">
+  <h2
+    className="text-2xl font-bold mb-6 text-center"
+    style={{ color: "var(--primary)" }}
+  >
+    Общая статистика анализа
+  </h2>
 
-      {/* Tone / Graph Section */}
-      <section className="mt-12 px-6 lg:px-16">
-        <GraphSection graphData={graphData} />
-      </section>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 
-      {/* Positive Reviews */}
-      <section className="mt-12 px-6 lg:px-16">
+    {/* 📌 Блок 1 — Линия удовлетворённости */}
+    <div className="p-4 rounded-3xl bg-[var(--input-bg)] dark:bg-black/20 backdrop-blur-xl shadow-lg border border-[var(--border)]">
+      <h3 className="text-center mb-3 font-semibold text-[var(--text)]/80">
+        Удовлетворённость граждан
+      </h3>
+      <SatisfactionLine satisfaction={72} />
+    </div>
+
+    {/* 📌 Блок 2 — Позитивные отзывы (кольцо) */}
+    <div className="p-4 rounded-3xl bg-[var(--input-bg)] dark:bg-black/20 backdrop-blur-xl shadow-lg border border-[var(--border)] flex justify-center items-center">
+      <div className="w-full">
+        <h3 className="text-center mb-3 font-semibold text-[var(--text)]/80">
+          Процент позитивных сообщений
+        </h3>
         <NeonRingProgress />
-      </section>
+      </div>
+    </div>
 
-      {/* History */}
-      <section className="mt-12 px-6 lg:px-16 mb-16">
-        <HistorySection />
-      </section>
+    {/* 📌 Блок 3 — График */}
+    <div className="p-4 rounded-3xl bg-[var(--input-bg)] dark:bg-black/20 backdrop-blur-xl shadow-lg border border-[var(--border)] col-span-1 md:col-span-2">
+      <h3 className="text-center mb-3 font-semibold text-[var(--text)]/80">
+        Изменение тональности по времени
+      </h3>
+      <GraphSection graphData={graphData} />
+    </div>
 
-      
+  </div>
+</section>
+<HistorySection feedbacks={feedbackData} />
+
     </div>
   );
 }

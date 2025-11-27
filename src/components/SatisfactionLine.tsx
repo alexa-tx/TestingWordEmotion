@@ -7,7 +7,8 @@ interface Props {
 }
 
 export default function SatisfactionLine({ satisfaction }: Props) {
-  const sentiment = satisfaction > 60 ? "Позитивный" : satisfaction < 40 ? "Негативный" : "Нейтральный";
+  const sentiment =
+    satisfaction > 60 ? "Позитивный" : satisfaction < 40 ? "Негативный" : "Нейтральный";
 
   const gradient =
     sentiment === "Позитивный"
@@ -23,16 +24,19 @@ export default function SatisfactionLine({ satisfaction }: Props) {
       ? { scale: [1, 1.05, 1], y: [0, -3, 0] }
       : { scale: [1, 1.05, 1], y: [0, -2, 0] };
 
-  // Цвет смайлика в зависимости от темы
-  const smileColor = `var(--smile)`; // в CSS через :root и [data-theme="dark"]
+  const smileColor = `var(--smile)`; 
 
   return (
-    <div className="flex flex-col items-center w-full max-w-3xl mx-auto py-12">
-      <h3 className="text-xl font-semibold mb-6 tracking-wide" style={{ color: "var(--primary)" }}>
-        Линия удовлетворенности граждан
+    <div className="w-full h-full p-4 flex flex-col">
+      <h3
+        className="text-lg font-semibold mb-3 tracking-wide"
+        style={{ color: "var(--primary)" }}
+      >
+        Удовлетворенность граждан
       </h3>
 
-      <div className="relative w-full h-12 rounded-full backdrop-blur-xl border border-white/20 overflow-hidden bg-[var(--line-bg)]">
+      <div className="relative w-full h-10 rounded-full backdrop-blur-xl border border-white/20 overflow-hidden bg-[var(--line-bg)]">
+        
         {/* Градиент линии */}
         <motion.div
           className="absolute inset-0"
@@ -53,31 +57,31 @@ export default function SatisfactionLine({ satisfaction }: Props) {
             mask: `linear-gradient(90deg, white ${satisfaction}%, transparent ${satisfaction}%)`,
             WebkitMask: `linear-gradient(90deg, white ${satisfaction}%, transparent ${satisfaction}%)`,
           }}
-        ></div>
+        />
 
         {/* Смайлик */}
         <motion.div
           className="absolute pointer-events-none"
-          style={{ left: `${satisfaction}%`, top: "8px", transform: "translateX(-50%)" }}
+          style={{ left: `${satisfaction}%`, top: "6px", transform: "translateX(-50%)" }}
           animate={smileAnimation}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          {sentiment === "Позитивный" && <FaSmile size={36} color={smileColor} />}
-          {sentiment === "Нейтральный" && <FaMeh size={36} color={smileColor} />}
-          {sentiment === "Негативный" && <FaFrown size={36} color={smileColor} />}
+          {sentiment === "Позитивный" && <FaSmile size={32} color={smileColor} />}
+          {sentiment === "Нейтральный" && <FaMeh size={32} color={smileColor} />}
+          {sentiment === "Негативный" && <FaFrown size={32} color={smileColor} />}
         </motion.div>
       </div>
 
-      {/* Цифры с процентами под шкалой */}
-      <div className="w-full flex justify-between px-2 mt-2 text-xs text-[var(--text)]/60 select-none">
-        {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((val) => (
+      {/* Цифры с процентами */}
+      <div className="w-full flex justify-between px-1 mt-2 text-[10px] text-[var(--text)]/60 select-none">
+        {[0, 20, 40, 60, 80, 100].map((val) => (
           <span key={val}>{val}%</span>
         ))}
       </div>
 
       {/* Текущий процент */}
-      <p className="mt-4 font-semibold text-[var(--text)]">
-        Уровень удовлетворенности: {satisfaction}%
+      <p className="mt-3 font-medium text-[var(--text)] text-sm">
+        Текущее значение: {satisfaction}%
       </p>
     </div>
   );
