@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export default function HeroSection() {
-    return (
-        <section className="flex flex-col items-center text-center py-32 px-6 bg-gradient-to-b from-[var(--secondary)]/10 to-[var(--background)]">
-            <h2 className="text-5xl lg:text-6xl font-extrabold mb-6" style={{ color: "var(--primary)" }}>
-                Анализ тональности текста
-            </h2>
-            <p className="text-lg lg:text-xl max-w-3xl mb-8" style={{ color: "var(--text)", opacity: 0.85, lineHeight: 1.8 }}>
-                Автоматический анализ сообщений горожан для быстрого и точного понимания их настроений.
-            </p>
-        </section>
-    );
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  return (
+    <section className="relative flex flex-col items-center text-center py-40 px-6 overflow-hidden">
+      {/* Cursor-follow circle */}
+      {cursorPos && (
+        <div
+          className="pointer-events-none fixed w-6 h-6 rounded-full bg-primary/50 blur-xl transition-transform duration-150"
+          style={{
+            left: cursorPos.x - 12,
+            top: cursorPos.y - 12,
+          }}
+        ></div>
+      )}
+
+      {/* Hero text */}
+      <h2 className="text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 text-primary dark:text-primary drop-shadow-lg">
+        Анализ тональности текста
+      </h2>
+
+      <p className="text-xl lg:text-2xl text-text/80 dark:text-text/70 leading-relaxed max-w-3xl">
+        Автоматический анализ сообщений горожан с использованием современных алгоритмов для глубокого понимания их настроений.
+      </p>
+    </section>
+  );
 }
