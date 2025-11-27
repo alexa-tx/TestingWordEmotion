@@ -1,30 +1,31 @@
 // src/pages/Feedback/Feedback.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchGroups } from "../../api/groups";
+import { Review } from "../../api/client";
 
-interface Feedback {
-  id: number;
-  user: string;
-  comment: string;
-  date: string;
-}
-
-interface Props {
-  feedbacks?: Feedback[];
-}
-
-// Пример данных (можно заменить на реальный fetch)
-const sampleFeedbacks: Feedback[] = [
-  { id: 1, user: "Иван Петров", comment: "Отличный сервис!", date: "2025-11-20" },
-  { id: 2, user: "Мария Иванова", comment: "Очень довольна результатом.", date: "2025-11-21" },
-  { id: 3, user: "Алексей Сидоров", comment: "Все просто супер!", date: "2025-11-22" },
-  { id: 4, user: "Елена Смирнова", comment: "Быстро и удобно.", date: "2025-11-23" },
-  { id: 5, user: "Дмитрий Кузнецов", comment: "Рекомендую всем!", date: "2025-11-24" },
-  { id: 6, user: "Анна Павлова", comment: "Очень профессионально.", date: "2025-11-25" },
-];
-
-const FeedbackPage: React.FC<Props> = ({ feedbacks = sampleFeedbacks }) => {
+const FeedbackPage: React.FC = () => {
   const navigate = useNavigate();
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const data = await fetchGroups();
+        // Собираем все отзывы всех групп
+        const allReviews = data.result.groups.flatMap(group => group.reviews);
+        setReviews(allReviews);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadReviews();
+  }, []);
+
+  if (loading) return <div>Загрузка всех отзывов...</div>;
 
   return (
     <div className="min-h-screen px-6 lg:px-16 py-12 flex flex-col items-center bg-[var(--background)] text-[var(--text)]">
@@ -33,17 +34,17 @@ const FeedbackPage: React.FC<Props> = ({ feedbacks = sampleFeedbacks }) => {
       </h1>
 
       <div className="w-full max-w-4xl flex flex-col gap-4">
-        {feedbacks.map((fb) => (
+        {reviews.map((fb) => (
           <div
             key={fb.id}
             className="p-4 rounded-2xl backdrop-blur-xl bg-white/20 dark:bg-black/10 
                        border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl transition"
           >
             <div className="flex justify-between items-center mb-2">
-              <span className="font-semibold text-[var(--text)]">{fb.user}</span>
-              <span className="text-xs text-[var(--text)]/60">{fb.date}</span>
+              <span className="font-semibold text-[var(--text)]">{fb.label}</span>
+              <span className="text-xs text-[var(--text)]/60">{fb.id}</span>
             </div>
-            <p className="text-[var(--text)]">{fb.comment}</p>
+            <p className="text-[var(--text)]">{fb.text}</p>
           </div>
         ))}
       </div>

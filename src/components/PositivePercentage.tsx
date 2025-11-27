@@ -1,24 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { uploadTextAndGetAnalysis, GroupResponse } from "../api/groups";
 
-export default function NeonRingProgress() {
+interface Props {
+  file: File | null;
+  onComplete?: (percentage: number) => void; // вызывается после анализа
+}
+
+export default function NeonRingProgress({ file, onComplete }: Props) {
   const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
-    }, 40);
-    return () => clearInterval(interval);
-  }, []);
-
+  const [percentage, setPercentage] = useState<number | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const radius = 55;
   const stroke = 10;
   const circumference = 2 * Math.PI * radius;
+
+  useEffect(() => {
+    if (!file) return;
+
+    const analyzeFile = async () => {
+      setIsAnalyzing(true);
+      setProgress(0);
+      setPercentage(null);
+
+      // имитация прогресса до 90%
+      const interval = setInterval(() => {
+        setProgress((prev) => Math.min(prev + 5, 90));
+      }, 100);
+
+      try {
+        // Читаем файл как текст
+        const text = await file.text();
+        const result: GroupResponse = await uploadTextAndGetAnalysis(text);
+
+        clearInterval(interval);
+
+        // конечное значение из API
+        const percent = result.result.percentagePositiveReview;
+        setPercentage(percent);
+        setProgress(100);
+
+        onComplete?.(percent);
+      } catch (err: any) {
+        console.error(err);
+        clearInterval(interval);
+        setProgress(0);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
+
+    analyzeFile();
+  }, [file, onComplete]);
+
   const offset = circumference - (progress / 100) * circumference;
 
   const getColor = () => {
-    if (progress < 40) return "#e74c3c";
-    if (progress < 70) return "#f1c40f";
+    const value = percentage !== null ? percentage : progress;
+    if (value < 40) return "#e74c3c";
+    if (value < 70) return "#f1c40f";
     return "#27ae60";
   };
 
@@ -35,7 +75,6 @@ export default function NeonRingProgress() {
         "
       >
         <div className="relative flex items-center justify-center">
-
           {/* Внешнее кольцо */}
           <motion.div
             className="absolute w-[150px] h-[150px] rounded-full"
@@ -43,8 +82,8 @@ export default function NeonRingProgress() {
               boxShadow: [
                 "0 0 8px var(--primary)",
                 "0 0 14px var(--primary)",
-                "0 0 8px var(--primary)"
-              ]
+                "0 0 8px var(--primary)",
+              ],
             }}
             transition={{ duration: 2, repeat: Infinity }}
             style={{ border: "3px solid var(--primary)" }}
@@ -61,7 +100,6 @@ export default function NeonRingProgress() {
               strokeWidth={stroke}
               fill="none"
             />
-
             {/* Прогресс */}
             <circle
               cx="80"
@@ -79,13 +117,17 @@ export default function NeonRingProgress() {
 
           {/* Значение */}
           <div className="absolute text-center">
-            <p className="text-[var(--text)] text-2xl font-bold">{progress}%</p>
+            <p className="text-[var(--text)] text-2xl font-bold">
+              {percentage !== null ? `${percentage}%` : `${progress}%`}
+            </p>
           </div>
         </div>
 
         {/* Подпись под прогрессом */}
         <p className="mt-4 text-sm text-[var(--text)]/70 font-medium">
-          Текущий прогресс анализа
+          {percentage !== null
+            ? "Результат анализа"
+            : "Текущий прогресс анализа"}
         </p>
       </div>
     </div>

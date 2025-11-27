@@ -4,7 +4,7 @@ import { useTheme } from "./hooks/useTheme";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Home from "./pages/Home/Home";
-import Feedback from "./pages/Feedback/feedback";
+import Feedback from "./pages/Feedback/Feedback";
 import HowItWorks from "./pages/HowItWorks/HowItWorks";
 
 function App() {

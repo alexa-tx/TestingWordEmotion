@@ -1,12 +1,48 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaSmile, FaFrown, FaMeh } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { uploadTextAndGetAnalysis, GroupResponse } from "../api/groups";
 
 interface Props {
-  satisfaction: number; // 0-100
+  file: File | null;
 }
 
-export default function SatisfactionLine({ satisfaction }: Props) {
+export default function SatisfactionLine({ file }: Props) {
+  const [satisfaction, setSatisfaction] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Авто-анализ при появлении файла
+  useEffect(() => {
+    if (!file) return;
+
+    const analyzeFile = async () => {
+      setIsAnalyzing(true);
+      setSatisfaction(0);
+
+      // имитация прогресса до 90%
+      const interval = setInterval(() => {
+        setSatisfaction((prev) => Math.min(prev + 3, 90));
+      }, 100);
+
+      try {
+        const text = await file.text(); // читаем файл как текст
+        const result: GroupResponse = await uploadTextAndGetAnalysis(text);
+        clearInterval(interval);
+
+        const percent = result.result.percentagePositiveReview;
+        setSatisfaction(percent);
+      } catch (err) {
+        console.error(err);
+        clearInterval(interval);
+        setSatisfaction(0);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
+
+    analyzeFile();
+  }, [file]);
+
   const sentiment =
     satisfaction > 60 ? "Позитивный" : satisfaction < 40 ? "Негативный" : "Нейтральный";
 
@@ -24,7 +60,7 @@ export default function SatisfactionLine({ satisfaction }: Props) {
       ? { scale: [1, 1.05, 1], y: [0, -3, 0] }
       : { scale: [1, 1.05, 1], y: [0, -2, 0] };
 
-  const smileColor = `var(--smile)`; 
+  const smileColor = `var(--smile)`;
 
   return (
     <div className="w-full h-full p-4 flex flex-col">
@@ -36,7 +72,6 @@ export default function SatisfactionLine({ satisfaction }: Props) {
       </h3>
 
       <div className="relative w-full h-10 rounded-full backdrop-blur-xl border border-white/20 overflow-hidden bg-[var(--line-bg)]">
-        
         {/* Градиент линии */}
         <motion.div
           className="absolute inset-0"
@@ -81,7 +116,7 @@ export default function SatisfactionLine({ satisfaction }: Props) {
 
       {/* Текущий процент */}
       <p className="mt-3 font-medium text-[var(--text)] text-sm">
-        Текущее значение: {satisfaction}%
+        {isAnalyzing ? "Анализируется..." : `Текущее значение: ${satisfaction}%`}
       </p>
     </div>
   );
