@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { uploadTextAndGetAnalysis, GroupResponse } from "../api/groups";
+import { uploadText , GroupResponse } from "../api/groups";
 
 interface Props {
   file: File | null;
@@ -31,7 +31,7 @@ export default function NeonRingProgress({ file, onComplete }: Props) {
       try {
         // Читаем файл как текст
         const text = await file.text();
-        const result: GroupResponse = await uploadTextAndGetAnalysis(text);
+        const result: GroupResponse = await uploadText (text);
 
         clearInterval(interval);
 

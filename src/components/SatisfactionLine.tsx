@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaSmile, FaFrown, FaMeh } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { uploadTextAndGetAnalysis, GroupResponse } from "../api/groups";
+import { uploadText , GroupResponse } from "../api/groups";
 
 interface Props {
   file: File | null;
@@ -26,7 +26,7 @@ export default function SatisfactionLine({ file }: Props) {
 
       try {
         const text = await file.text(); // читаем файл как текст
-        const result: GroupResponse = await uploadTextAndGetAnalysis(text);
+        const result: GroupResponse = await uploadText (text);
         clearInterval(interval);
 
         const percent = result.result.percentagePositiveReview;

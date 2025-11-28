@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaSmile, FaFrown, FaMeh } from "react-icons/fa";
-import { uploadTextAndGetAnalysis, Group, Review } from "../api/groups"; // <-- импортируем типы
+import { uploadText, Group, Review } from "../api/groups"; // <-- импортируем типы
 
 interface Props {
   textInput: string;
@@ -27,7 +27,7 @@ export default function SingleAnalysis({ textInput, setTextInput }: Props) {
     }, 30);
 
     try {
-      const result = await uploadTextAndGetAnalysis(textInput);
+      const result = await uploadText(textInput);
       clearInterval(interval);
 
       const percent = result.result.percentagePositiveReview;

@@ -1,45 +1,62 @@
-// src/api/groups.ts
-export interface Review {
-  id: string;
-  text: string;
-  label: "positive" | "neutral" | "negative";
-  confidence: number;
+import {
+  Review,
+  ReviewRequest,
+  ReviewResponse,
+  Group,
+  GroupsResponse,
+  FileUploadResponse
+} from "../api/api";
+
+const BASE_URL = "https://api.reviewanalyzer.mixdev.me/api";
+
+// Получить все группы
+export async function fetchGroups(): Promise<GroupsResponse> {
+  const res = await fetch(`${BASE_URL}/Group`);
+  if (!res.ok) throw new Error("Ошибка при получении групп");
+  return await res.json();
 }
 
-export interface Group {
-  id: string;
-  name: string;
-  date: string;
-  reviews: Review[];
-  generalScore: number; // от 0 до 1
-}
-
-export interface GroupResponse {
-  result: {
-    groups: Group[];
-    percentagePositiveReview: number; // 0-100
-  };
-  errorMessage: string | null;
-}
-
-// Отправка текста на анализ
-export async function uploadTextAndGetAnalysis(text: string): Promise<GroupResponse> {
-  const reviewRes = await fetch("https://api.reviewanalyzer.mixdev.me/api/Review", {
+// Отправить текст на анализ
+export async function uploadText(text: string): Promise<ReviewResponse> {
+  const res = await fetch(`${BASE_URL}/Review`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ review: text }),
   });
-  const reviewData = await reviewRes.json();
 
-  // Получаем группу (в твоем случае можно сразу получить последнюю созданную)
-  const groupRes = await fetch("https://api.reviewanalyzer.mixdev.me/api/Group");
-  const groupData: GroupResponse = await groupRes.json();
-  return groupData;
+  if (!res.ok) throw new Error("Ошибка анализа текста");
+  return await res.json();
 }
 
-export async function fetchGroups(): Promise<GroupResponse> {
-  const res = await fetch("https://api.reviewanalyzer.mixdev.me/api/Group");
-  if (!res.ok) throw new Error("Ошибка при получении групп");
-  const data: GroupResponse = await res.json();
-  return data;
+// Получить отзыв по ID
+export async function fetchReview(id: string): Promise<ReviewResponse> {
+  const res = await fetch(`${BASE_URL}/Review/${id}`);
+  if (!res.ok) throw new Error("Ошибка при получении отзыва");
+  return await res.json();
+}
+
+// Загрузить файл на сервер
+export async function uploadFile(file: File): Promise<FileUploadResponse> {
+  const fd = new FormData();
+  fd.append("file", file);
+
+  const res = await fetch(`${BASE_URL}/Group`, {
+    method: "POST",
+    body: fd
+  });
+
+  if (!res.ok) throw new Error("Ошибка загрузки файла");
+  return await res.json();
+}
+
+// Создать группу с текстом вручную
+export async function createGroup(name: string, text: string): Promise<Group> {
+  const res = await fetch(`${BASE_URL}/Group/postGroup?groupName=${encodeURIComponent(name)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(text)
+  });
+
+  if (!res.ok) throw new Error("Ошибка создания группы");
+  return await res.json();
 }
